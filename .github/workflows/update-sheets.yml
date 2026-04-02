@@ -1,0 +1,26 @@
+name: Atualizar Google Sheets
+
+on:
+  schedule:
+    - cron: "0 * * * *" # roda a cada 1 hora
+  workflow_dispatch: # permite rodar manualmente
+
+jobs:
+  update-sheet:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v3
+
+      - name: Baixar CSV do Google Sheets
+        run: |
+          curl -L "https://docs.google.com/spreadsheets/d/1s17Zlq0_zzD1ncRt-yPrLt9pvGqmrPPBIxj_52w_VIs/export?format=csv" -o dados.csv
+
+      - name: Commit e push se houver mudanças
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add dados.csv
+          git commit -m "Atualizando dados do Sheets" || exit 0
+          git push
